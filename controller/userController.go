@@ -3,6 +3,7 @@ package controller
 import (
 	"assigment3/model"
 	"encoding/json"
+	"fmt"
 	"math/rand"
 	"net/http"
 	"text/template"
@@ -46,11 +47,30 @@ func (w *Wind) StatusWind() string {
 	return Status
 }
 
+func UpdateWater(c chan int) {
+	wa := rand.Intn(99) + 1
+	fmt.Println("Water", wa)
+	c <- wa
+}
+
+func UpdateWind(c chan int) {
+	wi := rand.Intn(99) + 1
+	fmt.Println("Wind", wi)
+	c <- wi
+}
+
 func GetStatus(w http.ResponseWriter, r *http.Request) {
 	Result := model.Value{}
+	var waterVal int
+	var windVal int
+	c := make(chan int)
 
-	waterVal := rand.Intn(99) + 1
-	windVal := rand.Intn(99) + 1
+	go UpdateWater(c)
+	waterVal = <-c
+
+	go UpdateWind(c)
+	windVal = <-c
+
 	dataWater := Water{Val: waterVal}
 	dataWind := Wind{Val: windVal}
 
